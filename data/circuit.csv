@@ -1,4 +1,4 @@
-type,name,value,start_node,end_node
+type,name,value,startNode,endNode
 R,R1,3,0,1
 R,R2,4,1,2
 V,V1,32,3,0
