@@ -1,6 +1,6 @@
-type,name,value,startNode,endNode
-R,R1,3,0,1
-R,R2,4,1,2
-V,V1,32,3,0
-V,V2,20,3,2
-R,R3,8,3,1
+type,value,start_node,end_node
+R,3,4,1
+R,4,1,2
+V,32,3,4
+V,20,3,2
+R,8,3,1

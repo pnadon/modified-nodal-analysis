@@ -25,6 +25,12 @@ function main(a=0, b=131072, n=32768)
     h = (b - a) / n
 
     n_threads = nthreads()
+    if n_threads == 1
+        println("
+        Number of threads detected to be =1\n
+        environment variables may not be properly set up!"
+        )
+    end
     total = Atomic{Float64}(0)
     local_n::Int64 = div(n, n_threads)
     @threads for rank in 0:n_threads - 1
@@ -38,4 +44,6 @@ function main(a=0, b=131072, n=32768)
     println("the answer for a = $a, b = $b, n = $n: $(total[])")
 end
 
-main()
+for i=1:10000
+    main()
+end
