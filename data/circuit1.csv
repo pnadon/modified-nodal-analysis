@@ -1,6 +1,6 @@
 type,value,start_node,end_node
-V,32,2,1
+R,2,1,2
 R,4,2,3
-R,2,1,0
+V,32,1,0
 R,8,2,0
 V,20,3,0
