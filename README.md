@@ -1,5 +1,6 @@
 # modified-nodal-analysis
  a project for simulating MNA using Julia
+[reference](https://lpsa.swarthmore.edu/Systems/Electrical/mna/MNA3.html)
 
 # MNA steps:
 1. Select a reference node (usually ground) and name the remaining n-1 nodes.  Also label currents through each current source.  
