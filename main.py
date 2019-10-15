@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from scipy.sparse import linalg, csc_matrix, identity
+# from "python -m pip install cupy" -- MUST HAVE CUDA SETUP
+#  import cupy as cp
+# import cupyx.scipy.sparse as cp_sparse
 
 from lib import parse_stamp, get_nodes, get_vs, get_neighbour_components, assign_ids
 
