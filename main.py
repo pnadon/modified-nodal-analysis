@@ -28,7 +28,7 @@ len_ivs = len(voltage_sources)
 len_vs = len(voltage_sources)
 
 # generate b matrix, and initialize zero-filled A-matrix
-b = [0] * len_kcl + [v.val for v in voltage_sources]
+b = np.array([0] * len_kcl + [v.val for v in voltage_sources])
 A = np.zeros(((len_u_nodes + len_ivs, len(b))))
 
 # Parse components into A-matrix
