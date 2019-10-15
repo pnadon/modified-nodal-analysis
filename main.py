@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 from scipy.sparse import linalg, csc_matrix, identity
+
 # from "python -m pip install cupy" -- MUST HAVE CUDA SETUP
-# import cupy as cp
-# import cupyx.scipy.sparse as cp_sparse
+import cupy as cp
+import cupyx.scipy.sparse as cp_sparse
 
 from lib import parse_stamp, get_nodes, get_vs, get_neighbour_components, assign_ids
 
@@ -31,7 +32,7 @@ len_ivs = len(voltage_sources)
 len_vs = len(voltage_sources)
 
 # generate b matrix, and initialize zero-filled A-matrix
-b = [0] * len_kcl + [v.val for v in voltage_sources]
+b = np.array([0] * len_kcl + [v.val for v in voltage_sources])
 A = np.zeros(((len_u_nodes + len_ivs, len(b))))
 
 # Parse components into A-matrix
@@ -56,13 +57,11 @@ for i in range(len_kcl, len_kcl + len_vs):
     if voltage_sources[i - len_kcl].end_node != 0:
         A[i, voltage_sources[i - len_kcl].end_node - 1] = -1
 
-# a = cp_sparse.csr_matrix(construct_3d_matrix(pmap, eqns))
-# b = cp.asarray(construct_b(start_vals, end_vals, pmap.m_width, pmap.size_dirichlet_face, pmap.num_vars).transpose()[0])
-# construct_time = timer()
-# x = cp_sparse.linalg.lsqr(a, b)
-# compute_time = timer()
-# return [cp.asnumpy(x[0]), cp.asnumpy(b), construct_time, compute_time]
-x = linalg.spsolve(A, b)
+cupy_A = cp_sparse.csr_matrix(A)
+cupy_b = cp.asarray(b)
+cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)
+x = cp.asnumpy(x[0])
+# x = linalg.spsolve(A, b)
 
 print('-' * A.shape[0], '\n', A, '\n', '-' * A.shape[0])
 print(x)
