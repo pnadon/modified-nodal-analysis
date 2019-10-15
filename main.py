@@ -33,7 +33,7 @@ A = np.zeros(((len_u_nodes + len_ivs, len(b))))
 
 # Parse components into A-matrix
 height, width = A.shape
-time = 0
+time = 1
 # Assign KCL equations
 for i in range(0, len_kcl):
     row_components = get_neighbour_components(i + 1, components)
@@ -44,17 +44,14 @@ for i in range(0, len_kcl):
             if other_node != 0:
                 A[i, other_node - 1] += -1/component.val
         elif component.symbol == 'V':
-            A[i, len_u_nodes + component.id - 1] += \
-                1 * component.get_dir(i + 1)
-        # TODO: add I component calculation
-        # elif component.symbol == 'I':
-        #     b[i] += -1 * component.val * component.get_dir(i + 1)
-        # TODO: add C component calculation. INVOLVES TIME STEPS
-        # elif component.symbol == 'C':
-        #     A[i, i] += component.val * time
-            # other_node = component.get_other_node(i + 1)
-            # if other_node != 0:
-            #     A[i, other_node - 1] += -1 * component.val * time
+            A[i, len_u_nodes + component.id - 1] += component.get_dir(i + 1)
+        elif component.symbol == 'I':
+            b[i] += -1 * component.val * component.get_dir(i + 1)
+        elif component.symbol == 'C':
+            A[i, i] += component.val * time
+            other_node = component.get_other_node(i + 1)
+            if other_node != 0:
+                A[i, other_node - 1] += -1 * component.val * time
                 
 # Assign voltage equations
 for i in range(len_kcl, len_kcl + len_vs):
