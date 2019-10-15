@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy.sparse import linalg, csc_matrix, identity
+from scipy.sparse import linalg, csr_matrix, identity
 
 # from "python -m pip install cupy" -- MUST HAVE CUDA SETUP
 import cupy as cp
@@ -67,12 +67,17 @@ for i in range(len_kcl, len_kcl + len_vs):
     if voltage_sources[i - len_kcl].end_node != 0:
         A[i, voltage_sources[i - len_kcl].end_node - 1] = -1
 
-cupy_A = cp_sparse.csr_matrix(A)
-cupy_b = cp.asarray(b)
-cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)
-x = cp.asnumpy(x[0])
-# x = linalg.spsolve(A, b)
+# cupy_A = cp_sparse.csr_matrix(csr_matrix(A))
+# cupy_b = cp.asarray(b)
+# print(type(cupy_A), type(cupy_b))
+# cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)
+# x = cp.asnumpy(cupy_x[0])
+A_gpu = cp.array(A)
+b_gpu = cp.array(b)
+x_gpu = cp.linalg.solve(A_gpu, b_gpu)
+
+# x = linalg.lsqr(csr_matrix(A), b)
 
 print('-' * A.shape[0], '\n', A, '\n', '-' * A.shape[0])
-print(x)
+print(x_gpu.get())
 print(b)
