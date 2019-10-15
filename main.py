@@ -63,7 +63,7 @@ for i in range(len_kcl, len_kcl + len_vs):
     if voltage_sources[i - len_kcl].end_node != 0:
         A[i, voltage_sources[i - len_kcl].end_node - 1] = -1
 
-x = linalg.spsolve(A, b)
+x = linalg.spsolve(csc_matrix(A), b)
 
 print('-' * A.shape[0], '\n', A, '\n', '-' * A.shape[0])
 print(x)
