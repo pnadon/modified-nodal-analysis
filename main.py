@@ -5,7 +5,7 @@ from scipy.sparse import linalg, csc_matrix, identity
 from lib import parse_stamp, get_nodes, get_vs, get_neighbour_components, assign_ids
 
 # parse datafile into components
-df = pd.read_csv("./data/circuit.csv")
+df = pd.read_csv("./data/scam_circuit.csv")
 components = []
 for index, row in df.iterrows():
     components.append(parse_stamp(row))
