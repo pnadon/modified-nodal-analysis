@@ -21,6 +21,7 @@ for i in range(2, 11, 2):
                 "{},{},{},{},{},{},{}".format(
                     fname,
                     benchmark["matrix_size"][0],
+                    i
                     benchmark["num_components"],
                     'cuda',
                     benchmark["cuda"]["total"],
@@ -33,6 +34,7 @@ for i in range(2, 11, 2):
                 "{},{},{},{},{},{},{}".format(
                     fname,
                     benchmark["matrix_size"][0],
+                    i
                     benchmark["num_components"],
                     'cpu',
                     benchmark["cpu"]["total"],
