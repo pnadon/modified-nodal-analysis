@@ -1,0 +1,6 @@
+type,value,start_node,end_node
+C,17,0,1
+C,37,1,0
+R,45,0,1
+I,51,1,0
+V,30,1,0
