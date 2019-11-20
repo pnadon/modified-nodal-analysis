@@ -14,7 +14,6 @@ from lib import (
 
 
 def benchmark_MNA(df):
-  def compute_MNA(df, print_eqs=False):
     components = get_components(df)
     nodes = get_nodes(components)
 
@@ -29,15 +28,30 @@ def benchmark_MNA(df):
     start_cuda = timer()
     cupy_A = cp_sparse.csr_matrix(A)
     cupy_b = cp.asarray(b)
+    mid_cuda = timer()
     cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)[0]
     end_cuda = timer()
 
     start_cpu = timer()
     A = csr_matrix(A)
+    mid_cpu = timer()
     x = lsqr(A, b)
     end_cpu = timer()
 
-    return end_cpu - start_cpu, end_cuda - start_cuda
+    return {
+        'matrix_size': A.shape,
+        'num_components': len(components),
+        'cpu': {
+            'total': end_cpu - start_cpu,
+            'data transfer': mid_cpu - start_cpu,
+            'linear solve': end_cpu - mid_cpu
+        },
+        'cuda': {
+            'total': end_cuda - start_cuda,
+            'data transfer': mid_cuda - start_cuda,
+            'linear solve': end_cuda - mid_cuda
+        }
+    }
 
 
 def compute_MNA(df, print_eqs=False):

@@ -12,7 +12,7 @@ def gen_rand_circuit_file(fname, num_nodes, avg_connectivity):
     with open(fname, "w+") as fout:
         fout.write('type,value,start_node,end_node\n')
         for connection in connections:
-            fout.write('{},{},{},{}\n'.format(choice(symbols), randint(-1*value_scale, 1*value_scale), connection[0], connection[1]))
+            fout.write('{},{},{},{}\n'.format(choice(symbols), randint(1, 1*value_scale), connection[0], connection[1]))
 
 
 def gen_rand_node_connections(num_nodes, avg_connectivity):
