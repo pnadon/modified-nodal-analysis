@@ -1,7 +1,52 @@
 import pandas as pd
-import numpy as np
-from scipy.sparse import dok_matrix
+from numpy.random import gamma
+from math import sqrt
+from random import randint, choice
 from components import Resistor, Capacitor, VSource, ISource
+
+
+def gen_rand_circuit_file(fname, num_nodes, avg_connectivity):
+    symbols = ['C', 'V', 'I', 'R']
+    value_scale = 100
+    connections = gen_rand_node_connections(num_nodes, avg_connectivity)
+    with open(fname, "w+") as fout:
+        fout.write('type,value,start_node,end_node\n')
+        for connection in connections:
+            fout.write('{},{},{},{}\n'.format(choice(symbols), randint(-1*value_scale, 1*value_scale), connection[0], connection[1]))
+
+
+def gen_rand_node_connections(num_nodes, avg_connectivity):
+    num_components = num_nodes * avg_connectivity
+    ungrouped_nodes = num_nodes - 1
+    group_sizes = []
+    while( ungrouped_nodes > 0):
+        group_size = int(gamma(sqrt(num_nodes)//1, sqrt(num_nodes)//2))
+        if group_size < 1:
+            group_size = 1
+        if group_size > ungrouped_nodes:
+            group_sizes.append(ungrouped_nodes)
+            ungrouped_nodes = 0
+        else:
+            group_sizes.append(group_size)
+            ungrouped_nodes -= group_size
+    
+    start = 1
+    connections = []
+    for group_size in group_sizes:
+        connections.append((randint(0,start - 1),start))
+        for i in range(1, group_size - 1):
+            connections.append((start + i, start + i + 1))
+        connections.append((start + group_size - 1, randint(0,start - 1)))
+        start += group_size
+    num_connections_placed = num_nodes + len(group_sizes)
+    for i in range(num_components - num_connections_placed):
+        first_node = randint(0, num_nodes - 1)
+        second_node = randint(0, num_nodes - 1)
+        while second_node == first_node:
+            second_node = randint(0, num_nodes - 1)
+        connections.append((first_node, second_node))
+    
+    return connections
 
 
 def parse_stamp(df_row):
@@ -64,51 +109,3 @@ def get_neighbour_components(node, components):
         if component.is_node(node):
             res.append(component)
     return res
-
-
-def construct_A(b, components, voltage_sources, num_nodes):
-    len_u_nodes = num_nodes - 1
-    len_kcl = num_nodes - 1
-    len_ivs = len(voltage_sources)
-    len_vs = len(voltage_sources)
-    A = dok_matrix((len_u_nodes + len_ivs, len(b)))
-
-    # Parse components into A-matrix
-    height, width = A.shape
-    time = 1
-    # Assign KCL equations
-    for i in range(0, len_kcl):
-        row_components = get_neighbour_components(i + 1, components)
-        for component in row_components:
-            if component.symbol == "R":
-                A[i, i] += 1 / component.val
-                other_node = component.get_other_node(i + 1)
-                if other_node != 0:
-                    A[i, other_node - 1] += -1 / component.val
-            elif component.symbol == "V":
-                A[i, len_u_nodes + component.id - 1] += component.get_dir(i + 1)
-            elif component.symbol == "I":
-                b[i] += -1 * component.val * component.get_dir(i + 1)
-            elif component.symbol == "C":
-                A[i, i] += component.val * time
-                other_node = component.get_other_node(i + 1)
-                if other_node != 0:
-                    A[i, other_node - 1] += -1 * component.val * time
-
-    # Assign voltage equations
-    for i in range(len_kcl, len_kcl + len_vs):
-        if voltage_sources[i - len_kcl].start_node != 0:
-            A[i, voltage_sources[i - len_kcl].start_node - 1] = 1
-        if voltage_sources[i - len_kcl].end_node != 0:
-            A[i, voltage_sources[i - len_kcl].end_node - 1] = -1
-
-    return A
-
-
-def construct_b(voltage_sources, num_nodes):
-    len_kcl = num_nodes - 1
-    len_b = len_kcl + len(voltage_sources)
-    b = np.zeros((len_b,))
-    for i in range(len_kcl, len_b):
-        b[i] = voltage_sources[i - len_kcl].val
-    return b
