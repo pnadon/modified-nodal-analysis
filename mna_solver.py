@@ -26,7 +26,7 @@ def benchmark_MNA(df):
     A = construct_A(b, components, voltage_sources, num_nodes)
 
     start_cuda = timer()
-    mid_cuda = start_cuda
+    mid_cuda = -1
     try:
         cupy_A = cp_sparse.csr_matrix(A)
         cupy_b = cp.asarray(b)
@@ -34,6 +34,7 @@ def benchmark_MNA(df):
         cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)[0]
     except:
         print('failed to solve on gpu')
+        mid_cuda = -1
     end_cuda = timer()
 
     start_cpu = timer()
@@ -42,6 +43,12 @@ def benchmark_MNA(df):
     x = lsqr(A, b)
     end_cpu = timer()
 
+    if mid_cuda == -1:
+        cuda_trans_diff = ""
+        cuda_solve_diff = ""
+    else:
+        cuda_trans_diff = mid_cuda - start_cuda
+        cuda_solve_diff = end_cuda - mid_cuda
     return {
         'matrix_size': A.shape,
         'num_components': len(components),
@@ -52,8 +59,8 @@ def benchmark_MNA(df):
         },
         'cuda': {
             'total': end_cuda - start_cuda,
-            'data transfer': mid_cuda - start_cuda,
-            'linear solve': end_cuda - mid_cuda
+            'data transfer': cuda_trans_diff,
+            'linear solve': cuda_solve_diff
         }
     }
 
