@@ -1,15 +1,43 @@
 # from "python -m pip install cupy" -- MUST HAVE CUDA SETUP
-from scipy.sparse import dok_matrix
+from scipy.sparse import dok_matrix, csr_matrix
+from scipy.sparse.linalg import lsqr
 import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as cp_sparse
-
+from timeit import default_timer as timer
 from lib import (
     get_nodes,
     get_vs,
     get_neighbour_components,
     get_components,
 )
+
+
+def benchmark_MNA(df):
+  def compute_MNA(df, print_eqs=False):
+    components = get_components(df)
+    nodes = get_nodes(components)
+
+    # get unknown ivs
+    voltage_sources = get_vs(components)
+    num_nodes = len(nodes)
+
+    # generate b matrix, and initialize zero-filled A-matrix
+    b = construct_b(voltage_sources, num_nodes)
+    A = construct_A(b, components, voltage_sources, num_nodes)
+
+    start_cuda = timer()
+    cupy_A = cp_sparse.csr_matrix(A)
+    cupy_b = cp.asarray(b)
+    cupy_x = cp_sparse.linalg.lsqr(cupy_A, cupy_b)[0]
+    end_cuda = timer()
+
+    start_cpu = timer()
+    A = csr_matrix(A)
+    x = lsqr(A, b)
+    end_cpu = timer()
+
+    return end_cpu - start_cpu, end_cuda - start_cuda
 
 
 def compute_MNA(df, print_eqs=False):
