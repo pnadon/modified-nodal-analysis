@@ -1,4 +1,4 @@
 type,value,start_node,end_node
-I,94,0,1
-I,68,1,0
-I,64,0,1
+V,3,0,1
+C,27,1,0
+I,48,0,1
