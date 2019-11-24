@@ -1,4 +1,4 @@
-fname,matrix_size,num_nodes,avg_connectivity,num_components,processor,total,transfer,solve
+fname,matrix_size,num_nodes,avg_connect,num_components,processor,total,transfer,solve
 rand_data/rand_size-003_density-002.csv,1,2,2,3,cuda,0.6432228000000001,0.23948899999999998,0.40373380000000003
 rand_data/rand_size-003_density-002.csv,1,2,2,3,cpu,0.0007030999999999565,0.000248800000000049,0.00045429999999990756
 rand_data/rand_size-004_density-002.csv,4,4,2,6,cuda,0.003000100000000061,0.0009121000000000823,0.0020879999999999788
