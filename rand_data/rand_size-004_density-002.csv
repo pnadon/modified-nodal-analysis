@@ -1,0 +1,7 @@
+type,value,start_node,end_node
+C,48,0,1
+I,70,2,3
+C,75,3,0
+R,64,2,0
+I,72,0,3
+V,52,0,1
